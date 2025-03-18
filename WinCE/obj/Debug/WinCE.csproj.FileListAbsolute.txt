@@ -1,0 +1,11 @@
+C:\Clock sample project\NetOne\WinCE\bin\Debug\NETOne.exe
+C:\Clock sample project\NetOne\WinCE\bin\Debug\NETOne.pdb
+C:\Clock sample project\NetOne\WinCE\bin\Debug\Rebex.Common.dll
+C:\Clock sample project\NetOne\WinCE\bin\Debug\Rebex.Http.dll
+C:\Clock sample project\NetOne\WinCE\bin\Debug\Rebex.Networking.dll
+C:\Clock sample project\NetOne\WinCE\bin\Debug\Rebex.Networking.xml
+C:\Clock sample project\NetOne\WinCE\bin\Debug\Rebex.Http.xml
+C:\Clock sample project\NetOne\WinCE\bin\Debug\Rebex.Common.xml
+C:\Clock sample project\NetOne\WinCE\obj\Debug\ResolveAssemblyReference.cache
+C:\Clock sample project\NetOne\WinCE\obj\Debug\NETOne.exe
+C:\Clock sample project\NetOne\WinCE\obj\Debug\NETOne.pdb
