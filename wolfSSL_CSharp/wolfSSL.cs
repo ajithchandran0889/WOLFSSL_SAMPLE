@@ -1746,6 +1746,82 @@ namespace wolfSSL.CSharp
             }
         }
 
+        public static Socket DeserializeSocket(string serializedData)
+        {
+            if (string.IsNullOrEmpty(serializedData))
+                throw new ArgumentException("Invalid serialized socket data");
+
+            string[] parts = serializedData.Split(':');
+            if (parts.Length != 2)
+                throw new FormatException("Invalid socket format");
+
+            string address = parts[0];
+            int port = int.Parse(parts[1]);
+
+            // Create and connect a new socket
+            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(IPAddress.Parse(address), port);
+
+            return socket;
+        }
+
+        /// <summary>
+        /// Set Socket for TLS connection
+        /// </summary>
+        /// <param name="ssl">structure to set Socket in</param>
+        /// <param name="fd">Socket to use</param>
+        /// <returns>1 on success</returns>
+        public static int set_fd_new(IntPtr ssl, string receivedData)
+        {
+            Socket fd = DeserializeSocket(receivedData);
+            /* sanity check on inputs */
+            if (ssl == IntPtr.Zero)
+            {
+                return FAILURE;
+            }
+
+            try
+            {
+                if (!fd.Equals(null))
+                {
+#if COMPACT_FRAMEWORK
+                    GCHandle gch = (GCHandle)ssl;
+#else
+                    GCHandle gch = GCHandle.FromIntPtr(ssl);
+#endif
+                    ssl_handle handles = (ssl_handle)gch.Target;
+
+                    IntPtr sslCtx = handles.get_ssl();
+                    IntPtr ptr;
+                    GCHandle fd_pin = GCHandle.Alloc(fd); // NOTE: Pinned only needed for buffers, not simple refs
+
+                    if (sslCtx == IntPtr.Zero)
+                    {
+                        log(ERROR_LOG, "wolfssl error setting up fd!!");
+                        return FAILURE;
+                    }
+
+                    handles.set_fd(fd_pin);
+#if COMPACT_FRAMEWORK
+                    ptr = (IntPtr)fd_pin; // instead of GCHandle.ToIntPtr(fd_pin)
+#else
+                    ptr = GCHandle.ToIntPtr(fd_pin);
+#endif
+
+                    wolfSSL_SetIOWriteCtx(sslCtx, ptr); //pass along the socket for writing to
+                    wolfSSL_SetIOReadCtx(sslCtx, ptr); //pass along the socket for reading from
+
+                    return SUCCESS;
+                }
+
+                return FAILURE;
+            }
+            catch (Exception e)
+            {
+                log(ERROR_LOG, "Error setting up fd!! " + e.ToString());
+                return FAILURE;
+            }
+        }
 
         /// <summary>
         /// Set Socket for TLS connection
